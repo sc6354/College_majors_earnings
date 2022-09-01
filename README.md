@@ -3,6 +3,7 @@ This project contains two noteboks: (1) Visualizing Earnings Based on College Ma
 
 # SQL Analysis Summary:
 1. What majors have more than 50% share of women? How does the unemployment rate for these majors compare to the average unemployment rate of all majors?
+
 ` Early Childhood Education, Communication Disorders Sciences And Services, Medical Assisting Services, Elementary Education, & Family And Consumer Sciences had the most female graduates.`
 
 2. Do majors with more than 90% female grads have a lower average unemployment rate than the overall average unemployment rate?
