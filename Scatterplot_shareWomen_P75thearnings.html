@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<!-- Load d3.js -->
+<script src="https://d3js.org/d3.v4.js"></script>
+
+<!-- Initialize a select button -->
+<select id="selectButton"></select>
+
+<!-- Create a div where the graph will take place -->
+<div id="my_dataviz"></div>
+
+<!-- Color Scale -->
+<script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+
+<script>
+
+// set the dimensions and margins of the graph
+var margin = {top: 10, right: 30, bottom: 30, left: 60},
+    width = 460 - margin.left - margin.right,
+    height = 400 - margin.top - margin.bottom;
+
+// append the svg object to the body of the page
+var svg = d3.select("#my_dataviz")
+  .append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", height + margin.top + margin.bottom)
+  .append("g")
+    .attr("transform",
+          "translate(" + margin.left + "," + margin.top + ")");
+
+//Read the data
+d3.csv("https://raw.githubusercontent.com/fivethirtyeight/data/master/college-majors/recent-grads.csv", function(data) {
+
+   // List of majors
+   var allMajors = ["All Majors",
+                    "Health", 
+                    "Psychology & Social Work",
+                    "Humanities & Liberal Arts",
+                    "Communications & Journalism", 
+                    "Arts", 
+                    "Biology & Life Science",
+                    "Industrial Arts & Consumer Services",
+                    "Social Science",
+                    "Interdisciplinary",
+                    "Law & Public Policy",
+                    "Agriculture & Natural Resources",
+                    "Physical Sciences",  
+                    "Business",
+                    "Computers & Mathematics",
+                    "Engineering"]
+
+   // add the options to the button
+   d3.select("#selectButton")
+     .selectAll('myOptions')
+     .data(allMajors)
+     .enter()
+     .append('option')
+     .text(d => d) // text showed in the menu
+     .attr("value", d => d) // corresponding value returned by the button
+     .style("left", "30px")
+     .style("top", "20px")
+ 
+   // A color scale: one color for each group
+   //var myColor = d3.scaleOrdinal()
+    // .domain(allMajors)
+    // .range(d3.schemeSet2); 
+
+  // Add X axis
+  var x = d3.scaleLinear()
+    .domain([0, 1])
+    .range([ 0, width ]);
+  svg.append("g")
+    .attr("transform", "translate(0," + (height-margin.bottom) + ")")
+    .call(d3.axisBottom(x));
+
+  // X axis label 
+  svg.append("text")
+    .attr("class", "x label")
+    .attr("text-anchor", "end")
+    .attr("x", width)
+    .attr("y", height)
+    .attr("dy", ".3em")
+    .text("Proportion of Women");
+
+  // Add Y axis
+  var maxRate = d3.max(data, d => d.P75th);
+  var y = d3.scaleLinear()
+    .domain([0, maxRate])
+    .range([ height - margin.bottom, 0]);
+  svg.append("g")
+    .call(d3.axisLeft(y));
+
+  // Y axis label
+  svg.append("text")
+    .attr("class", "y label")
+    .attr("text-anchor", "end")
+    .attr("y", 6)
+    .attr("dy", "-3.25em")
+    .attr("transform", "rotate(-90)")
+    .text("Median Salary ($)");
+
+
+  //Initalize scatterplot with all data points
+  svg.append('g')
+    .selectAll("dot")
+    .data(data)
+    .enter()
+    .append("circle")
+      .attr("cx", d => x(d.ShareWomen))
+      .attr("cy", d => y(d.P75th))
+      .attr("r",5)
+      .attr("fill-opacity", .5)
+      .style("fill", d3.rgb('#005e7c'))
+      .attr("stroke", "darkblue");
+    
+
+  // A function that update the chart
+  function update(selectedMajor) {
+    var dots = svg.append('g')
+      .selectAll("dot")
+      .data(data)
+      .enter()
+      .append("circle")
+        .attr("cx", d => x(d.ShareWomen))
+        .attr("cy", d => y(d.P75th))
+        .attr("r", 5)
+        .attr("fill-opacity", .5)
+        .style("fill", d3.rgb('#005e7c'))
+        .attr("stroke", "darkblue");
+
+    if (selectedMajor != "All Majors")
+        {
+          var dataFilter = data.filter(d => d.Major_category == selectedMajor)
+        }
+      else {
+          var dataFilter = data
+      }
+    
+    console.log(dataFilter)
+    
+    // update
+    dots = svg.selectAll("circle").data(dataFilter)
+
+    // enter
+    dots
+      .enter()
+      .append("circle")
+      .merge(dots)
+      .transition()
+        .duration(1000)
+        .attr("cx", d => x(d.ShareWomen))
+        .attr("cy", d => y(d.P75th))
+    console.log(dots)
+
+    // exit
+    dots.exit().remove()
+
+  };
+
+  // When the button is changed, run the updateChart function
+  d3.select("#selectButton").on("change", function(d) {
+      // recover the option that has been chosen
+      var selectedOption = d3.select(this).property("value")
+
+      // run the updateChart function with this selected option
+      update(selectedOption)
+      
+  });
+
+})
+</script>
