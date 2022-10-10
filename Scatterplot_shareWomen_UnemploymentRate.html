@@ -111,7 +111,8 @@ d3.csv("https://raw.githubusercontent.com/fivethirtyeight/data/master/college-ma
       .attr("cy", d => y(d.Unemployment_rate))
       .attr("r",5)
       .attr("fill-opacity", .5)
-      .style("fill", d3.rgb('#005e7c'));
+      .style("fill", d3.rgb('#005e7c'))
+      .attr("stroke", "darkblue");
     
 
   // A function that update the chart
@@ -125,7 +126,8 @@ d3.csv("https://raw.githubusercontent.com/fivethirtyeight/data/master/college-ma
         .attr("cy", d => y(d.Unemployment_rate))
         .attr("r", 5)
         .attr("fill-opacity", .5)
-        .style("fill", d3.rgb('#005e7c'));
+        .style("fill", d3.rgb('#005e7c'))
+        .attr("stroke", "darkblue");
 
     if (selectedMajor != "All Majors")
         {
